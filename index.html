@@ -1,42 +1,82 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>在线双人小游戏</title>
+    <title>在线聊天应用</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      #chatbox {
+        width: 400px;
+        height: 300px;
+        overflow: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+      }
+      #inputbox {
+        margin-top: 10px;
+      }
+      #message {
+        width: 300px;
+        padding: 5px;
+      }
+      #send {
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <h1>在线双人小游戏</h1>
-    <canvas id="canvas" width="400" height="400"></canvas>
+    <div id="chatbox"></div>
+    <form id="inputbox">
+      <input type="text" id="message" placeholder="输入你的消息...">
+      <button type="submit" id="send">发送</button>
+    </form>
 
     <script>
-      // 创建 WebSocket 连接
       const socket = new WebSocket('ws://localhost:8080');
 
-      // 监听连接打开事件
       socket.addEventListener('open', () => {
         console.log('Connected to server');
       });
 
-      // 监听消息事件
       socket.addEventListener('message', event => {
         console.log(`Received message: ${event.data}`);
-        // 处理消息并更新游戏状态
+        addMessage(event.data);
       });
 
-      // 监听错误事件
       socket.addEventListener('error', error => {
         console.error(`WebSocket error: ${error}`);
       });
 
-      // 监听连接关闭事件
       socket.addEventListener('close', () => {
         console.log('Disconnected from server');
       });
 
-      // 在 Canvas 中绘制游戏图形
-      const canvas = document.getElementById('canvas');
-      const context = canvas.getContext('2d');
-      context.fillStyle = 'red';
-      context.fillRect(50, 50, 50, 50);
+      const chatbox = document.getElementById('chatbox');
+      const messageInput = document.getElementById('message');
+      const sendButton = document.getElementById('send');
+
+      sendButton.addEventListener('click', event => {
+        event.preventDefault();
+        const message = messageInput.value;
+        if (message.trim()) {
+          socket.send(message);
+          addMessage(`Me: ${message}`);
+          messageInput.value = '';
+        }
+      });
+
+      function addMessage(message) {
+        const p = document.createElement('p');
+        p.innerText = message;
+        chatbox.appendChild(p);
+      }
     </script>
   </body>
 </html>
