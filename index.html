@@ -1,82 +1,98 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>在线聊天应用</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-      }
-      #chatbox {
-        width: 400px;
-        height: 300px;
-        overflow: auto;
-        border: 1px solid #ccc;
-        padding: 10px;
-      }
-      #inputbox {
-        margin-top: 10px;
-      }
-      #message {
-        width: 300px;
-        padding: 5px;
-      }
-      #send {
-        padding: 5px 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="chatbox"></div>
-    <form id="inputbox">
-      <input type="text" id="message" placeholder="输入你的消息...">
-      <button type="submit" id="send">发送</button>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+
+    form {
+      margin-top: 20px;
+      display: flex;
+    }
+
+    input[type=text] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px 0 0 5px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      background-color: #009688;
+      color: #fff;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Chat Room</h1>
+    <ul id="messages"></ul>
+    <form id="message-form">
+      <input type="text" id="input-message" placeholder="Type your message here..." autocomplete="off">
+      <button>Send</button>
     </form>
+  </div>
 
-    <script>
-      const socket = new WebSocket('ws://localhost:8080');
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var socket = io();
 
-      socket.addEventListener('open', () => {
-        console.log('Connected to server');
-      });
+    $('#message-form').submit(function(e) {
+      e.preventDefault();
+      socket.emit('chat message', $('#input-message').val());
+      $('#input-message').val('');
+      return false;
+    });
 
-      socket.addEventListener('message', event => {
-        console.log(`Received message: ${event.data}`);
-        addMessage(event.data);
-      });
-
-      socket.addEventListener('error', error => {
-        console.error(`WebSocket error: ${error}`);
-      });
-
-      socket.addEventListener('close', () => {
-        console.log('Disconnected from server');
-      });
-
-      const chatbox = document.getElementById('chatbox');
-      const messageInput = document.getElementById('message');
-      const sendButton = document.getElementById('send');
-
-      sendButton.addEventListener('click', event => {
-        event.preventDefault();
-        const message = messageInput.value;
-        if (message.trim()) {
-          socket.send(message);
-          addMessage(`Me: ${message}`);
-          messageInput.value = '';
-        }
-      });
-
-      function addMessage(message) {
-        const p = document.createElement('p');
-        p.innerText = message;
-        chatbox.appendChild(p);
-      }
-    </script>
-  </body>
+    socket.on('chat message', function(msg) {
+      $('#messages').append($('<li>').text(msg));
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</body>
 </html>
