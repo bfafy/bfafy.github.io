@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>搜索页面</title>
-		<style>
+	<style>
 		body {
 			background-color: #f5f5f5;
 			font-family: Arial, sans-serif;
@@ -48,43 +48,79 @@
 		button[type="submit"]:hover {
 			background-color: #0077e6;
 		}
-				#flower-container {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
-			z-index: 9999;
-		}
-		.flower {
-			position: absolute;
-			display: block;
-			border-radius: 50%;
-			background-color: #f00;
-			animation-duration: 2s;
-			animation-timing-function: ease-out;
-			animation-fill-mode: forwards;
-			opacity: 0.75;
-			pointer-events: none;
-		}
-		@keyframes flower-fall {
-			from {
-				transform: translateY(-200px) scale(1);
-				opacity: 1;
-			}
-			to {
-				transform: translateY(800px) scale(0.2);
-				opacity: 0;
-			}
-		}
+		.confetti {
+  position: absolute;
+  z-index: 9999;
+  box-shadow: 0 0 10px #fff;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  animation: confetti-anim 2s ease-out;
+}
+
+@keyframes confetti-anim {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  100% {
+    transform: translateY(500px) rotate(360deg);
+  }
+}
+      body {
+        background-image: url("https://img.zcool.cn/community/03846395b1b4ca5a80121bbecde872c.jpg");
+        background-size: cover; /* 背景图片大小适应 */
+      }
+
+    #tail {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: red;
+      transition: all 0.3s ease; /* 可选：添加过渡效果 */
+    }
 	</style>
+<script>
+function createConfetti(event) {
+  const confetti = document.createElement('div');
+  confetti.classList.add('confetti');
+  confetti.style.left = `${event.clientX}px`;
+  confetti.style.top = `${event.clientY}px`;
+  confetti.style.background = `hsla(${Math.random() * 360}, 100%, 50%, 0.8)`;
+  document.body.appendChild(confetti);
+  
+  setTimeout(() => {
+    confetti.remove();
+  }, 2000);
+}
+
+document.addEventListener('click', createConfetti);
+
+
+</script>
 </head>
+  
 <body>
+
 	<form action="https://www.baidu.com/s" method="get">
 		<label for="searchBox">请输入搜索关键词：</label>
 		<input type="text" id="searchBox" name="wd">
 		<button type="submit">搜索</button>
 	</form>
+	
+	  <div id="tail"></div>
+  <script>
+    var tail = document.getElementById('tail');
+
+    document.addEventListener('mousemove', function(event) {
+      var x = event.clientX;
+      var y = event.clientY;
+      tail.style.left = x + 'px';
+      tail.style.top = y + 'px';
+    });
+  </script>
+  
 </body>
+
 </html>
